@@ -15,7 +15,7 @@ To use the importer, either clone this repository and copy the `lib/sprite_fusio
 ```ruby
 require 'lib/sprite_fusion/map'
 
-    module Main
+module Main
     def tick(args)
         args.state.world ||= SpriteFusion::Map.new(
         'maps/map.json',
