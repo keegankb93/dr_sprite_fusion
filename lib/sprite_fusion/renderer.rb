@@ -8,6 +8,8 @@ module SpriteFusion
       @map = map
     end
 
+    # TODO: I think we can do some yield/block shenanigans here so that the sprites can be
+    #       rendered to w/e target
     def render(args)
       args.outputs.sprites << sprites
     end
