@@ -56,7 +56,7 @@ module SpriteFusion
     def create_tile(raw_tile)
       id = raw_tile['id'].to_i
 
-      sprite = {
+      {
         x: raw_tile['x'] * tile_size,
         y: (@map_height - raw_tile['y'] - 1) * @tile_size,
         w: tile_size,
@@ -67,10 +67,6 @@ module SpriteFusion
         tile_h: tile_size,
         path: @spritesheet
       }
-
-      puts "BAD TILE_Y id=#{id} tile_y=#{sprite[:tile_y]} raw=#{raw_tile}" if sprite[:tile_y] % @tile_size != 0
-
-      sprite
     end
 
     #
