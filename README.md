@@ -6,7 +6,7 @@ All you need to do is tell the importer where your JSON file and tileset image i
 
 #### Disclaimer
 
-This is an initial version of the importer. There are likely to be bugs and performane optimizations have not been implemented yet.
+This is an initial version of the importer. There are likely to be bugs and performance optimizations have not been implemented yet.
 
 ## Usage
 
