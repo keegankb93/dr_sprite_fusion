@@ -22,8 +22,8 @@ module Main
     args.state.player.size ||= 32
 
     args.state.enemy ||= {}
-    args.state.enemy.x    ||= world.width - 200
-    args.state.enemy.y    ||= world.height - 200
+    args.state.enemy.x    ||= world.cell(5, 3).x
+    args.state.enemy.y    ||= world.cell(5, 3).y
     args.state.enemy.size ||= 16
 
     args.state.camera ||= Camera.new(x: 0, y: 0)

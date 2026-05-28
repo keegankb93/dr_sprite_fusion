@@ -26,7 +26,8 @@ module SpriteFusion
           r: r,
           g: g,
           b: b,
-          a: a
+          a: a,
+          primitive_marker: :line
         }
       end
 
@@ -41,11 +42,12 @@ module SpriteFusion
           r: r,
           g: g,
           b: b,
-          a: a
+          a: a,
+          primitive_marker: :line
         }
       end
 
-      target.lines << lines
+      target.debug << lines
     end
 
     def screen_to_world(screen_x, screen_y)
@@ -70,7 +72,7 @@ module SpriteFusion
         cell ? "Cell: #{cell.col}, #{cell.row}" : 'Cell: out of bounds'
       ]
 
-      $args.outputs.sprites << {
+      $args.outputs.debug << {
         x: 0,
         y: 80.from_top,
         w: 360,
@@ -79,10 +81,10 @@ module SpriteFusion
         g: 0,
         b: 0,
         a: 128,
-        path: :solid
+        primitive_marker: :solid
       }
 
-      $args.outputs.labels << labels.map_with_index do |text, i|
+      $args.outputs.debug << labels.map_with_index do |text, i|
         {
           x: 10,
           y: 10.from_top - (i * 22),
@@ -91,7 +93,8 @@ module SpriteFusion
           r: 255,
           g: 255,
           b: 255,
-          a: 255
+          a: 255,
+          primitive_marker: :label
         }
       end
     end
