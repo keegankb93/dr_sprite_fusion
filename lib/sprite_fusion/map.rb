@@ -12,6 +12,14 @@ module SpriteFusion
       @data = SpriteFusion::Loader.new(data_path, spritesheet)
     end
 
+    #
+    # Renders a debug view of the map
+    # Configurable via a block that yields a debug_config hash
+    # Available configuration options:
+    # - :show_grid (default: false)
+    # - :target (default: nil) the grid will only be overlayed on the render target
+    # - :camera (default: nil) the camera to use for screen-to-world conversions for cell_info within the view
+    # - :cell_info (default: nil) the cell info to display in the debug view
     def debug(&block)
       debug_config = {}
 
@@ -43,26 +51,36 @@ module SpriteFusion
       @sprites_for_layer[name] ||= layer[:tiles]
     end
 
+    #
+    # Returns the width in pixels of the map
     def width
       @width ||= data.map_width * data.tile_size
+    end
+
+    #
+    # Returns the height in pixels of the map
+    def height
+      @height ||= data.map_height * data.tile_size
     end
 
     def tile_size
       @tile_size ||= data.tile_size
     end
 
-    def height
-      @height ||= data.map_height * data.tile_size
-    end
-
+    #
+    # Returns the number of columns in the map provided by SpriteFusion data
     def columns
       @columns ||= data.map_width
     end
 
+    #
+    # Returns the number of rows in the map provided by SpriteFusion data
     def rows
       @rows ||= data.map_height
     end
 
+    # This is just a generalized cell, it does not actually return back the cell at that location
+    # TODO: It may be beneficial to be able to target a cell on a layer, which should be possible via our other methods
     def cell(col, row)
       raise(SpriteFusion::Errors::CellOutOfBoundsError, col, row) if out_of_bounds(col, row)
 

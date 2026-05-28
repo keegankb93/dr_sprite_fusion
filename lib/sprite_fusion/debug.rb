@@ -9,7 +9,7 @@ module SpriteFusion
 
     def render
       grid if config.fetch(:grid, true)
-      hover if config.fetch(:cell_info, false)
+      display_cell_info if config.fetch(:cell_info, false)
     end
 
     def grid(r: 255, g: 255, b: 255, a: 80)
@@ -59,7 +59,7 @@ module SpriteFusion
       }
     end
 
-    def hover
+    def display_cell_info
       mouse = $args.inputs.mouse
       world_pos = screen_to_world(mouse.x, mouse.y)
       cell = map.cell_at(world_pos.x, world_pos.y)
@@ -70,7 +70,7 @@ module SpriteFusion
         cell ? "Cell: #{cell.col}, #{cell.row}" : 'Cell: out of bounds'
       ]
 
-      $args.outputs.primitives << {
+      $args.outputs.sprites << {
         x: 0,
         y: 80.from_top,
         w: 360,
@@ -78,8 +78,9 @@ module SpriteFusion
         r: 0,
         g: 0,
         b: 0,
-        a: 128
-      }.solid!
+        a: 128,
+        path: :solid
+      }
 
       $args.outputs.labels << labels.map_with_index do |text, i|
         {
@@ -97,6 +98,8 @@ module SpriteFusion
 
     private
 
+    #
+    # Target the specified output or $args.outputs if none is specified
     def target
       if config.target
         $args.outputs[config.target]
