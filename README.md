@@ -49,7 +49,7 @@ module Main
       'maps/spritesheet.png'
     )
 
-    args.state.world.render_layer(args, 'Ground')
+    args.state.world.sprites_for_layer('Ground')
   end
 end
 ```
