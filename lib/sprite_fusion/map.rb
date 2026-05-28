@@ -1,16 +1,23 @@
-require_relative 'loader'
 require_relative 'errors'
+require_relative 'loader'
+require_relative 'debug'
 
 module SpriteFusion
   # Provides access to loading and rendering a SpriteFusion map.
   # TODO: Memoizing everything may not be the play especially just for the accessors
   class Map
     attr_reader :data
-    attr_accessor :debug
 
-    def initialize(data_path, spritesheet, debug: false)
+    def initialize(data_path, spritesheet)
       @data = SpriteFusion::Loader.new(data_path, spritesheet)
-      @debug = debug
+    end
+
+    def debug(&block)
+      debug_config = {}
+
+      yield(debug_config) if block_given?
+
+      SpriteFusion::Debug.new(self, debug_config).render
     end
 
     def layers
@@ -57,7 +64,7 @@ module SpriteFusion
     end
 
     def cell(col, row)
-      raise(SpriteFusion::Errors::CellOutOfBoundsError, col, row) if col >= columns || row >= rows
+      raise(SpriteFusion::Errors::CellOutOfBoundsError, col, row) if out_of_bounds(col, row)
 
       {
         col: col,
@@ -69,7 +76,20 @@ module SpriteFusion
       }
     end
 
+    def cell_at(x, y)
+      col = x.idiv(tile_size)
+      row = y.idiv(tile_size)
+
+      return nil if out_of_bounds(col, row)
+
+      cell(col, row)
+    end
+
     private
+
+    def out_of_bounds(col, row)
+      col.negative? || row.negative? || col >= columns || row >= rows
+    end
 
     def find_layer_by_name(name)
       layers.find { |layer| layer.name == name }

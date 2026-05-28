@@ -9,6 +9,12 @@ module Main
     )
 
     world = args.state.world
+    world.debug do |debug_config|
+      debug_config.target = :scene
+      debug_config.camera = args.state.camera
+      debug_config.grid = true
+      debug_config.cell_info = true
+    end
 
     args.state.player ||= {}
     args.state.player.x    ||= 0
@@ -27,28 +33,23 @@ module Main
     enemy  = args.state.enemy
     camera = args.state.camera
 
-    # 1. Update player first
     if args.inputs.directional_angle
-      player.x += args.inputs.directional_angle.vector_x * 5
-      player.y += args.inputs.directional_angle.vector_y * 5
+      player.x += args.inputs.directional_angle.vector_x * 2
+      player.y += args.inputs.directional_angle.vector_y * 2
 
       player.x = player.x.clamp(0, world.width - player.size)
       player.y = player.y.clamp(0, world.height - player.size)
     end
 
-    # 2. Update camera
     camera.handle_camera_inputs(args)
     camera.follow(player, world)
 
-    # 3. Render world into scene target
     scene = args.outputs[:scene]
     scene.w = world.width
     scene.h = world.height
 
-    # map
     scene.sprites << world.sprites
 
-    # player
     scene.sprites << {
       x: player.x,
       y: player.y,
@@ -60,7 +61,6 @@ module Main
       b: 255
     }
 
-    # enemy
     scene.sprites << {
       x: enemy.x,
       y: enemy.y,
@@ -72,12 +72,10 @@ module Main
       b: 0
     }
 
-    # 4. Draw camera view to screen once
     args.outputs.sprites << camera.viewport_sprite
 
-    # UI last, directly to screen
     args.outputs.primitives << {
-      x: 0,
+      x: Grid.w - 360,
       y: 80.from_top,
       w: 360,
       h: 80,
@@ -88,7 +86,7 @@ module Main
     }.solid!
 
     args.outputs.primitives << {
-      x: 10,
+      x: Grid.w - 350,
       y: 10.from_top,
       text: 'arrow keys to move around',
       r: 255,
@@ -97,7 +95,7 @@ module Main
     }.label!
 
     args.outputs.primitives << {
-      x: 10,
+      x: Grid.w - 350,
       y: 30.from_top,
       text: '+/- to change zoom of camera',
       r: 255,
