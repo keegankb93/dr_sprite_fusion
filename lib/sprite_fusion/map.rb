@@ -16,11 +16,11 @@ module SpriteFusion
     end
 
     def layers
-      data.layers
+      @layers ||= data.layers
     end
 
     def layer_names
-      data.layers.map(&:name)
+      @layer_names ||= @layers.map(&:name)
     end
 
     def tile_size
