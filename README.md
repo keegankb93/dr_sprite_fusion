@@ -30,7 +30,7 @@ module Main
       'maps/spritesheet.png'
     )
 
-    args.state.world.render(args)
+    args.output.sprites << args.state.world.sprites
   end
 end
 ```
