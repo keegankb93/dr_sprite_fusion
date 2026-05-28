@@ -57,9 +57,9 @@ end
 This is useful if you want to control render order manually:
 
 ```ruby
-args.state.world.render_layer(args, 'Water')
-args.state.world.render_layer(args, 'Ground')
-args.state.world.render_layer(args, 'Objects')
+args.state.world.sprites_for_layer('Water')
+args.state.world.sprites_for_layer('Ground')
+args.state.world.sprites_for_layer('Objects')
 ```
 
 ## Debug Rendering
@@ -81,8 +81,12 @@ module Main
       'maps/spritesheet.png'
     )
 
-    args.state.world.render(args)
-    args.state.world.render_debug(args)
+    args.state.world.debug do |debug_config|
+      debug_config.target = :scene
+      debug_config.camera = args.state.camera
+      debug_config.grid = true
+      debug_config.cell_info = true
+    end
   end
 end
 ```
@@ -103,12 +107,17 @@ module Main
     )
 
     # Render layers manually.
-    args.state.world.render_layer(args, 'Water')
-    args.state.world.render_layer(args, 'Ground')
-    args.state.world.render_layer(args, 'Objects')
+    args.state.world.sprites_for_layer('Water')
+    args.state.world.sprites_for_layer('Ground')
+    args.state.world.sprites_for_layer('Objects')
 
-    # Optional debug overlay.
-    args.state.world.render_debug(args)
+    # Optional debug overlay. Note: this can be rendered in any order since it uses $args.outputs.debug
+    args.state.world.debug do |debug_config|
+      debug_config.target = :scene
+      debug_config.camera = args.state.camera # This is your own camera
+      debug_config.grid = true
+      debug_config.cell_info = true
+    end
   end
 end
 ```
