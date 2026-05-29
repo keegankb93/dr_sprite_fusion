@@ -10,21 +10,30 @@ class Camera
     @show_empty_space = show_empty_space
   end
 
+  #
+  # Returns the width of the camera viewport in world pixels
+  # This shrinks as the camera scale increases, creating the zoom-in effect
   def source_w
     w / scale
   end
 
+  #
+  # Returns the height of the camera viewport in world pixels
+  # This shrinks as the camera scale increases, creating the zoom-in effect
   def source_h
     h / scale
   end
 
-  def viewport_sprite
+  #
+  # Returns the sprite used to render the scene render target to the screen
+  # The source values control which part of the world the camera is looking at
+  def viewport_for(target_path)
     {
       x: 0,
       y: 0,
       w: w,
       h: h,
-      path: :scene,
+      path: target_path,
       source_x: x,
       source_y: y,
       source_w: source_w,
@@ -32,6 +41,9 @@ class Camera
     }
   end
 
+  #
+  # Handles camera-specific keyboard input
+  # Allows zooming in/out and toggling whether empty space outside the map is shown
   def handle_camera_inputs(args)
     if args.inputs.keyboard.plus && Kernel.tick_count.zmod?(3)
       self.scale += 0.1
@@ -48,6 +60,9 @@ class Camera
     self.scale = scale.clamp(min_scale_for(args.state.world), 8.0)
   end
 
+  #
+  # Centers the camera on the given target
+  # Clamps afterward so the camera does not show outside the world bounds
   def follow(target, world)
     @x = target.x - source_w.half
     @y = target.y - source_h.half
@@ -55,6 +70,9 @@ class Camera
     clamp_to_world(world)
   end
 
+  #
+  # Returns the minimum scale needed to keep the world filling the screen
+  # Prevents zooming out so far that empty space appears around the whole map
   def min_scale_for(world)
     [
       w.fdiv(world.width),
@@ -62,6 +80,9 @@ class Camera
     ].max
   end
 
+  #
+  # Keeps the camera viewport inside the world bounds
+  # The max calls handle maps smaller than the current camera viewport
   def clamp_to_world(world)
     @x = @x.clamp(0, [world.width - source_w, 0].max)
     @y = @y.clamp(0, [world.height - source_h, 0].max)

@@ -12,14 +12,16 @@ module Main
     world.debug do |debug_config|
       debug_config.target = :scene
       debug_config.camera = args.state.camera
+      debug_config.collisions = true
       debug_config.grid = true
       debug_config.cell_info = true
     end
 
     args.state.player ||= {}
-    args.state.player.x    ||= 0
-    args.state.player.y    ||= 0
-    args.state.player.size ||= 32
+    args.state.player.x    ||= world.cell(0, 3).x
+    args.state.player.y    ||= world.cell(0, 3).y
+    args.state.player.w    ||= 16
+    args.state.player.h    ||= 16
 
     args.state.enemy ||= {}
     args.state.enemy.x    ||= world.cell(5, 3).x
@@ -34,11 +36,17 @@ module Main
     camera = args.state.camera
 
     if args.inputs.directional_angle
-      player.x += args.inputs.directional_angle.vector_x * 2
-      player.y += args.inputs.directional_angle.vector_y * 2
+      dx = args.inputs.directional_angle.vector_x * 2
+      dy = args.inputs.directional_angle.vector_y * 2
 
-      player.x = player.x.clamp(0, world.width - player.size)
-      player.y = player.y.clamp(0, world.height - player.size)
+      next_player = player.merge(x: player.x + dx)
+      player.x += dx unless world.collides?(next_player)
+
+      next_player = player.merge(y: player.y + dy)
+      player.y += dy unless world.collides?(next_player)
+
+      player.x = player.x.clamp(0, world.width - player.w)
+      player.y = player.y.clamp(0, world.height - player.h)
     end
 
     camera.handle_camera_inputs(args)
@@ -48,13 +56,13 @@ module Main
     scene.w = world.width
     scene.h = world.height
 
-    scene.sprites << world.sprites
+    world.render_to(scene)
 
     scene.sprites << {
       x: player.x,
       y: player.y,
-      w: player.size,
-      h: player.size,
+      w: player.w,
+      h: player.h,
       path: :solid,
       r: 0,
       g: 0,
@@ -72,7 +80,7 @@ module Main
       b: 0
     }
 
-    args.outputs.sprites << camera.viewport_sprite
+    args.outputs.sprites << camera.viewport_for(:scene)
 
     args.outputs.primitives << {
       x: Grid.w - 360,

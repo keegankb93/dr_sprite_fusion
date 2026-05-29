@@ -9,6 +9,7 @@ module SpriteFusion
 
     def render
       grid if config.fetch(:grid, true)
+      collisions if config.fetch(:collisions, false)
       display_cell_info if config.fetch(:cell_info, false)
     end
 
@@ -50,6 +51,24 @@ module SpriteFusion
       target.debug << lines
     end
 
+    def collisions(r: 255, g: 0, b: 0, a: 180)
+      rects = map.collidable_tiles.filter_map do |tile|
+        rect = tile[:collision_rect]
+
+        next unless rect
+
+        rect.merge(
+          r: r,
+          g: g,
+          b: b,
+          a: a,
+          primitive_marker: :border
+        )
+      end
+
+      target.debug << rects
+    end
+
     def screen_to_world(screen_x, screen_y)
       camera = config.camera
 
@@ -89,7 +108,7 @@ module SpriteFusion
           x: 10,
           y: 10.from_top - (i * 22),
           text: text,
-          size_enum: -2,
+          size_enum: -1,
           r: 255,
           g: 255,
           b: 255,

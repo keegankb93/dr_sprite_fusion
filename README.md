@@ -30,12 +30,36 @@ module Main
       'maps/spritesheet.png'
     )
 
-    args.output.sprites << args.state.world.sprites
+    args.state.world.render_to(args.output)
   end
 end
 ```
 
-## Rendering a Specific Layer
+## Rendering to a specific output
+
+You can render to a specific output by passing it to `render_to`:
+
+```ruby
+require 'lib/sprite_fusion/map'
+
+module Main
+  def tick(args)
+    args.state.world ||= SpriteFusion::Map.new(
+      'maps/map.json',
+      'maps/spritesheet.png'
+    )
+
+    scene = args.outputs[:scene]
+    args.state.world.render_to(scene)
+  end
+end
+```
+
+
+## Control your own rendering
+
+If you want to have more granular control over rendering there are a few methods available:
+
 
 You can render a specific layer by name:
 
@@ -49,27 +73,115 @@ module Main
       'maps/spritesheet.png'
     )
 
-    args.state.world.sprites_for_layer('Ground')
+    args.outputs.sprites << args.state.world.find_layer_by(name: 'Ground').tiles
   end
 end
 ```
 
-This is useful if you want to control render order manually:
-
-```ruby
-args.state.world.sprites_for_layer('Water')
-args.state.world.sprites_for_layer('Ground')
-args.state.world.sprites_for_layer('Objects')
-```
-
-## Debug Rendering
-
-You can include the debug helper:
-
 ```ruby
 require 'lib/sprite_fusion/map'
-require 'lib/sprite_fusion/debug'
+
+module Main
+  def tick(args)
+    args.state.world ||= SpriteFusion::Map.new(
+      'maps/map.json',
+      'maps/spritesheet.png'
+    )
+
+    args.outputs.sprites << %w[Water Ground Objects].flat_map do |layer_name|
+      args.state.world.find_layer_by(name: layer_name).tiles
+    end
+  end
+end
 ```
+
+Render the tiles yourself:
+
+```ruby
+module Main
+  def tick(args)
+    args.state.world ||= SpriteFusion::Map.new(
+      'maps/map.json',
+      'maps/spritesheet.png'
+    )
+
+    args.outputs.sprites << args.state.world.tiles
+  end
+end
+```
+
+Render the layers yourself:
+
+```ruby
+module Main
+  def tick(args)
+    args.state.world ||= SpriteFusion::Map.new(
+      'maps/map.json',
+      'maps/spritesheet.png'
+    )
+
+    args.outputs.sprites << args.state.world.layers.flat_map(&:tiles)
+  end
+end
+```
+
+## Collisions
+
+SpriteFusion exports layers as collision layers or you can use custom attributes to define a custom hitbox
+
+You'll mainly use the `collides?` method to check for collisions
+
+```ruby
+module Main
+  def tick(args)
+    args.state.world ||= SpriteFusion::Map.new(
+      'maps/map.json',
+      'maps/spritesheet.png'
+    )
+
+    args.state.world.render_to(args.outputs)
+
+    args.state.player ||= { x: 0, y: 0, width: 16, height: 16 }
+
+    if args.inputs.directional_angle
+      dx = args.inputs.directional_angle.vector_x * 2
+      dy = args.inputs.directional_angle.vector_y * 2
+
+      next_player = player.merge(x: player.x + dx) # get next pos
+      player.x += dx unless world.collides?(next_player) # check for collisions before moving
+
+      next_player = player.merge(y: player.y + dy) # get next pos
+      player.y += dy unless world.collides?(next_player) # check for collisions before moving
+
+      player.x = player.x.clamp(0, world.width - player.w)
+      player.y = player.y.clamp(0, world.height - player.h)
+    end
+    
+  end
+end
+```
+
+If your tile needs a more custom hitbox, you can define it in the tile's attributes:
+
+``` IMAGE HERE ```
+
+
+## Custom attributes
+
+Alongside the above hitbox definition, you can define custom attributes for anything you need and handle it
+however you want.
+
+```json
+{
+  "attributes": {
+    "health": 100
+  }
+}
+```
+
+Will be available in the tile's `attributes` hash.
+
+## Debug Rendering
 
 Then render debug information:
 
@@ -86,6 +198,7 @@ module Main
       debug_config.camera = args.state.camera
       debug_config.grid = true
       debug_config.cell_info = true
+      debug_config.collisions = true
     end
   end
 end
