@@ -163,7 +163,7 @@ end
 
 If your tile needs a more custom hitbox, you can define it in the tile's attributes:
 
-``` IMAGE HERE ```
+<img width="815" height="477" alt="Screenshot 2026-05-28 at 10 20 52 PM" src="https://github.com/user-attachments/assets/8a22491a-7410-4410-849a-b5624183f854" />
 
 
 ## Custom attributes
