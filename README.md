@@ -6,7 +6,7 @@ This takes a SpriteFusion JSON export and its generated `spritesheet.png` and al
 
 ## Disclaimer
 
-This is an early version. There are probably bugs, missing features, and performance optimizations that have not been implemented yet.
+There may be bugs, edge cases and potential performance optimizations that can still be made. Feel free to create an issue and I'll take a look or if you have a solution feel free to make a pull request.
 
 ## Installation
 
