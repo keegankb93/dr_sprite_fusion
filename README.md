@@ -2,7 +2,7 @@
 
 A simple DragonRuby importer for [SpriteFusion](https://www.spritefusion.com/) maps.
 
-This takes a SpriteFusion JSON export and its generated `spritesheet.png`, then converts the map into DragonRuby-compatible sprite hashes.
+This takes a SpriteFusion JSON export and its generated `spritesheet.png` and allows you to render it in your DragonRuby game.
 
 ## Disclaimer
 
